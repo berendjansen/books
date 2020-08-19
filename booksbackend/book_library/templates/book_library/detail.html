@@ -1,0 +1,183 @@
+{% extends 'book_library/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="row" style="margin-top: 1em;">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	<h3 class="panel-title">{{ book.title }} - {{ status }}</h3>
+      </div>
+      <div class="panel-body">
+	<table class="table">
+	  <tr>
+	    <td>Title:</td>
+	    <td>'{{ book.title }}'</td>
+	  </tr>
+	  <tr>
+	    <td>Subtitle:</td>
+	    <td>{{ book.subtitle }}</td>
+	  </tr>
+	  <tr>
+	    <td>Author:</td>
+	    <td>{{ book.authors.all|join:", " }}</td>
+	  </tr>
+	  <tr>
+	    <td>Publication date:</td>
+	    <td>{{ book.publication_date }}</td>
+	  </tr>
+	  <tr>
+	    <td>Pages:</td>
+	    <td>{{ book.pages }}</td>
+	  </tr>
+	  <tr>
+	    <td>Publisher:</td>
+	    <td>{{ book.publisher }}</td>
+	  </tr>
+	  <tr>
+	    <td>EAN:</td>
+	    <td>{{ book.EAN }}</td>
+	  </tr>
+	    <!-- {% if book %} -->
+	    <!-- <ul> -->
+	    <!--   {% for f in fieldnames %} -->
+	    <!--   <li>{{ f }} </li> -->
+	    <!--   {% endfor %} -->
+	    <!-- </ul> -->
+	    <!-- {% else %} -->
+	    <!-- <p>No books are available.</p> -->
+	    <!-- {% endif %} -->
+	</table>
+      </div>
+    </div>
+    <br>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	<h3 class="panel-title">Status</h3>
+      </div>
+      <div class="panel-body">
+	<table class="table">
+	  <tbody>
+	    <tr>
+	      <td>Status:</td>
+	      <td>{{ status }}</td>
+	    </tr>
+	    
+	    {% ifnotequal book.score 0 %}
+	    <tr>
+	    <td>Rating:</td> <td>{{ book.score }}</td>
+	    </tr>
+	    {% endifnotequal %}
+	    
+	    <tr>
+	      <td>Date added:</td>
+	      <td>{{ book.date_added }}</td>
+	    </tr>
+	    
+	    {% if book.date_acquired %}
+	    <tr>
+	      <td>Date acquired:</td>
+	      <td>{{ book.date_acquired }}</td>
+	    </tr>
+	    {% endif %}
+	    
+	    {% if book.date_started_reading %}
+	    <tr>
+	      <td>Started reading on:</td>
+	      <td>{{  book.date_started_reading }}</td>
+	    </tr>
+	    {% endif %}
+	    
+	    {% if book.date_read %}
+	    <tr>
+	      <td>Finished reading on:</td>
+	      <td>{{ book.date_read }}</td>
+	    </tr>
+	    {% endif %}
+	    
+	  </tbody>
+	</table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	<h3 class="panel-title"></h3>
+      </div>
+      <div class="panel-body">
+	<div class="list-group">
+	  <div class="list-group-item clearfixb">
+	    {% with 'book_library/thumbnails/'|add:book.title|add:'.jpg' as img_static %}
+	      <img class="img-rounded img-responsive" alt="Book thumbnail" style="margin-left: 12px;" src="{% static img_static %}"  width="50%">
+	      {% endwith %}
+	  </div>
+	</div>
+      </div>
+    </div>
+        <div class="panel panel-default">
+      <div class="panel-heading">
+	<h3 class="panel-title">Rating</h3>
+      </div>
+      <div class="panel-body">
+	<div class="list-group">
+	  <div class="list-group-item clearfix">
+	    <form action="{% url 'book_library:rate' book.id %}" method="post">
+	      {% csrf_token %}
+	      {% for i in score_range %}
+	      <div class="form-check form-check-inline col-auto">
+		<input type="radio" name="score" id="score{{ i }}" value="{{ i }}" class="form-check-input">
+		<label for="score{{ i }}" class="form-check-label">
+		  {{ i  }}
+		</label>
+	      </div>
+	      {% endfor %}
+	      <input type="submit" value="Vote" class="float-right">
+	    </form>
+	  </div>
+	</div>	
+      </div>
+    </div>
+    <br>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	<h3 class="panel-title">Status</h3>
+      </div>
+      <div class="panel-body">
+	<div class="list-group">
+	  <div class="list-group-item clearfix">
+	    <form action="{% url 'book_library:change_status' book.id %}" method="post">
+
+	      {% csrf_token %}
+	      <div class="form-check">
+		<input type="radio" name="status" id="statuswishlist" value="On wishlist" class="form-check-input">
+		<label for="statuswishlist" class="form-check-label">
+		  On wishlist
+		</label>
+	      </div>
+	      <div class="form-check">
+		<input type="radio" name="status" id="statuspossesion" value="In possession" class="form-check-input">
+		<label for="statuspossesion" class="form-check-label">
+		  In possession
+		</label>
+	      </div>
+	      <div class="form-check">
+		<input type="radio" name="status" id="statusread" value="Read" class="form-check-input">
+		<label for="statusread" class="form-check-label">
+		  Read
+		</label>
+	      </div>
+	      <div class="form-check">
+		<input type="radio" name="status" id="statusreading" value="Currently reading" class="form-check-input">
+		<label for="statusreading" class="form-check-label">
+		  Currently Reading
+		</label>
+	      </div>
+	      <input type="submit" value="Change">
+	    </form>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

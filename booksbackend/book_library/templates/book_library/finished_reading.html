@@ -1,0 +1,58 @@
+{% extends 'book_library/base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="row" style="margin-top: 1em;">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	<h3 class="panel-title">Finished reading ({{ finished_list|length }})</h3>
+      </div>
+      <div class="panel-body">
+	<div class="list-group">
+	  {% if finished_list %}
+	  {% for book in finished_list %}
+	  <a class="list-group-item clearfix" href="{% url 'book_library:detail' book.id  %}">
+	    <div class="float-right">
+	      {% with 'book_library/thumbnails/'|add:book.title|add:'.jpg' as img_static %}
+	      <img class="img-rounded img-responsive" alt="Book thumbnail" style="margin-left: 12px;" src="{% static img_static %}"  width="40px">
+	      {% endwith %}
+	    </div>
+	    <small>{{ book.date_added }}</small>
+	    <br>
+	    '{{ book.title }}'
+	    <br>
+	    <small> {{ book.authors.all|join:", " }} </small>
+	    <br>
+
+	  </a>
+	  {% endfor %}
+	  {% else %}
+	  <p>No books are available.</p>
+	  {% endif %}
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+<!-- <!DOCTYPE html> -->
+<!-- <html> -->
+<!--   <head> -->
+<!--     <meta charset="utf-8"> -->
+
+<!--     <title>My Library</title> -->
+<!--   </head> -->
+<!--   <body> -->
+<!--     {% if book_list %} -->
+<!--     <ul> -->
+<!--       {% for book in book_list %} -->
+<!--       <li><a href="{% url 'book_library:detail' book.id  %}">{{ book.title }}</a></li> -->
+<!--       {% endfor %} -->
+<!--     </ul> -->
+<!--     {% else %} -->
+<!--     <p>No books are available.</p> -->
+<!--     {% endif %} -->
+<!--   </body> -->
+<!-- </html> -->
