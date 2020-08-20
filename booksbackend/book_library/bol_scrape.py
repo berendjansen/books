@@ -79,9 +79,9 @@ def remove_whitepace_dd(dd):
     return stripped
 
 # url = "https://www.bol.com/nl/p/gouden-bergen/9200000124091929/?bltgh=oZIf0eSjOQHBpmHMkv1BLw.1_4.6.ProductImage"
-url = "https://www.bol.com/nl/f/uncanny-valley/9200000099807607/"
+# url = "https://www.bol.com/nl/f/uncanny-valley/9200000099807607/"
 
-get_information(url)
+# get_information(url)
 
 
 

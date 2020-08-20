@@ -12,4 +12,8 @@ media
 
 book_library/static/
 
+
 *key.txt
+
+
+booksbackend/settings.py
