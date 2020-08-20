@@ -11,3 +11,5 @@ db.sqlite3-journal
 media
 
 book_library/static/
+
+*key.txt
