@@ -11,3 +11,4 @@ db.sqlite3-journal
 media
 
 book_library/static/
+booksbackend/settings.py
