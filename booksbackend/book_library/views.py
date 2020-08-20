@@ -14,7 +14,7 @@ from .bol_scrape import get_information
 
 
 def index(request):
-    book_list = Book.objects.order_by('-publication_date')[:25]
+    book_list = Book.objects.order_by('-date_added')[:25]
     latest_wish_list = Book.objects.filter(on_wishlist=True).order_by('-date_added')[:10]
     
     latest_finished_list = Book.objects.filter(read=True).order_by('-date_read')[:10]
@@ -152,7 +152,7 @@ def add_book(request):
                         publication_date=parsed_date,
                         publisher=new_publisher,
                         pages=information['pages'],
-                        EAN=information['EAN'],
+                        # EAN=information['EAN'],
                         URL=url,
                         date_added=datetime.datetime.now())
 

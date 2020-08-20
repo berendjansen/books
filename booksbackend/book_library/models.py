@@ -37,7 +37,7 @@ class Book(models.Model):
     date_acquired = models.DateField(null=True, blank=True)
     date_read = models.DateField(null=True, blank=True)
     
-    EAN = models.CharField(max_length=20, default=0)
+    EAN = models.CharField(max_length=20, default=0, null=True)
     URL = models.URLField(max_length=200, default='#')
     
     # class Meta:
