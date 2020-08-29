@@ -24,7 +24,7 @@
 	  </tr>
 	  <tr>
 	    <td>Author:</td>
-	    <td>{{ book.authors.all|join:", " }}</td>
+	    <td><a href="{% url 'book_library:author_page' author.id %}">{{ book.author }}</a></td>
 	  </tr>
 	  <tr>
 	    <td>Publication date:</td>

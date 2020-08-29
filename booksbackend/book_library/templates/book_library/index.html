@@ -38,7 +38,7 @@
 	    <br>
 	    '{{ book.title }}'
 	    <br>
-	    <small> {{ book.authors.all|join:", " }} </small>
+	    <small> {{ book.author }} </small>
 	    <br>
 
 	  </a>
@@ -51,6 +51,21 @@
     </div>
   </div>
   <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	<h3 class="panel-title">Search books</h3>
+      </div>
+      <div class="panel-body">
+	<div class="list-group">
+	  <form action="{% url 'book_library:search_book' %}" method="GET">
+	  {% csrf_token %}
+	  <input class="form-control" type="text" name="search_book" id="search_book" placeholder="Search in library">
+	  <br>
+	  <!-- <button class="btn btn-default float-right" type="submit">Add</button> -->
+	</form>
+	</div>
+      </div>
+    </div>
     <div class="panel panel-default">
       <div class="panel-heading">
 	<h3 class="panel-title">Currently Reading</h3>
@@ -69,7 +84,7 @@
 	    <br>
 	    '{{ book.title }}'
 	    <br>
-	    <small> {{ book.authors.all|join:", " }} </small>
+	    <small> {{ book.author }} </small>
 	    <br>
 	  </a>
 	  {% endif %}
@@ -95,7 +110,7 @@
 	    <br>
 	    '{{ book.title }}'
 	    <br>
-	    <small> {{ book.authors.all|join:", " }} </small>
+	    <small> {{ book.author }} </small>
 	    <br>
 	  </a>
 	  {% endfor %}
@@ -120,7 +135,7 @@
 	    <br>
 	    '{{ book.title }}'
 	    <br>
-	    <small> {{ book.authors.all|join:", " }} </small>
+	    <small> {{ book.author }} </small>
 	    <br>
 	    <small>Rating: {{ book.score }}/5 </small>
 	  </a>

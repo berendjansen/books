@@ -10,7 +10,6 @@ class Publisher(models.Model):
 class Author(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    full_name = models.CharField(max_length=100, default=f'{first_name} {last_name}')
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -18,10 +17,12 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=100, unique=True)
     subtitle = models.CharField(max_length=200, default='')
-    authors = models.ManyToManyField(Author)
+
+    author = models.ForeignKey(Author, on_delete=models.DO_NOTHING)
+
     publisher = models.ForeignKey(Publisher, on_delete=models.DO_NOTHING)
     publication_date = models.DateField()
-    pages = models.IntegerField(default=0)
+    # pages = models.IntegerField(default=0)
     score = models.IntegerField(
         default=0,
         validators=[MaxValueValidator(5), MinValueValidator(0)]
@@ -37,14 +38,11 @@ class Book(models.Model):
     date_acquired = models.DateField(null=True, blank=True)
     date_read = models.DateField(null=True, blank=True)
     
-    EAN = models.CharField(max_length=20, default=0, null=True)
+    isbn = models.CharField(max_length=20, default=0, null=True)
     URL = models.URLField(max_length=200, default='#')
     
     # class Meta:
         # unique_together = ['title', 'EAN']
-    
-    def get_authors(self):
-        return ", ".join([str(a) for a in self.authors.all()])                    
     
     def __str__(self):
         return self.title

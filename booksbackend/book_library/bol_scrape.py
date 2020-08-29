@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup as BS
 import re
 import urllib.request
 import os
+import json
 
 def get_information(url):
     information = dict()
@@ -10,78 +11,72 @@ def get_information(url):
     response = requests.get(url)
     html = BS(response.text, "html.parser")
 
-    # print(html)
+    json_script = html.find_all("script", attrs={"type":"application/ld+json"})
+    
+    json_book = json.loads(json_script[-1].string)
 
-    title = html.find("span", attrs={"data-test":"title"})
+    
+    book_title = json_book['name']
+
     subtitle = html.find("span", attrs={"data-test":"subtitle"})
-    author = html.find("a", attrs={"data-role":"AUTHOR"})
-
-    book_title = title.text
     if subtitle:
         book_subtitle = subtitle.text
     else:
-        book_subtitle = ''
-    book_author = author.text
+        book_subtitle = ""
+    
+    try:
+        book_author = json_book['author']['name']
+    except:
+        book_author = json_book['brand']['name']
+
+    try:
+        book_publisher = json_book['publisher']['name']
+    except:
+        backup_div = html.find("div", attrs={"data-test":"taxonomy_data"})
+        backup_json = json.loads(backup_div.text)
+        print(backup_json)
+        book_publisher = backup_json['pdpTaxonomyObj']['productInfo'][0]['publisher']
+
+    try:
+        book_pub_date = json_book['workExample']['datePublished']
+    except:
+        book_pub_date = json_book['releaseDate']
+
+    try:
+        book_isbn = json_book['workExample']['isbn']
+    except:
+        book_isbn = json_book['gtin13']
     
 
-    raw_specs_list_1 = html.find_all(class_="specs__list")[0].find_all()
-
-    for i in range(len(raw_specs_list_1)):
-
-        if remove_whitepace_dd(raw_specs_list_1[i].text) == "Verschijningsdatum":
-            raw_pub_date = remove_whitepace_dd(raw_specs_list_1[i+1].text)
-            pub_date_number = ''.join(s for s in raw_pub_date if s.isdigit())
-            pub_date_month = ''.join(s for s in raw_pub_date if not s.isdigit())
-            book_pub_date = f'{pub_date_month.capitalize()} {pub_date_number}'
-
-        # parse page numbers
-        elif remove_whitepace_dd(raw_specs_list_1[i].text) == "Aantalpagina's":
-            raw_page_number = remove_whitepace_dd(raw_specs_list_1[i+1].text)
-            book_page_numbers = ''.join(s for s in raw_page_number if s.isdigit())
-            
-    # parse publisher
-    raw_specs_list_2 = html.find_all(class_="specs__list")[1].find_all()
-    for i in range(len(raw_specs_list_2)):
-
-        if remove_whitepace_dd(raw_specs_list_2[i].text) == "Uitgever":
-            raw_book_publisher = remove_whitepace_dd(raw_specs_list_2[i+1].text)
-
-    book_publisher = ' '.join(re.findall('[A-Z][^A-Z]*', raw_book_publisher))
-
-    raw_specs_list_3 = html.find_all(class_="specs__list")[2].find_all()
-
-    for i in range(len(raw_specs_list_3)):
-        if remove_whitepace_dd(raw_specs_list_3[i].text) == "EAN":
-            book_EAN = remove_whitepace_dd(raw_specs_list_3[i+1].text)
-
+    book_img = json_book['image']['url']
+    
     information['title'] = book_title
     information['subtitle'] = book_subtitle
-    information['authors'] = book_author
+    information['author'] = book_author
     information['publisher'] = book_publisher
     information['publication_date'] = book_pub_date
-    information['pages'] = book_page_numbers
-    information['EAN'] = book_EAN
+    # information['pages'] = book_page_numbers
+    information['isbn'] = book_isbn
 
-    img = html.find(attrs={'data-test':'product-image'})
-
-    if img:
-        img_url = img['src']
-        urllib.request.urlretrieve(img_url, f"book_library/static/book_library/thumbnails/{book_title}.jpg")
-    
+    if book_img:
+        urllib.request.urlretrieve(book_img, f"book_library/static/book_library/thumbnails/{book_title}.jpg")
+        
     return information
 
 
-def remove_whitepace_dd(dd):
+# def remove_whitepace_dd(dd):
 
-    dd = dd.replace("\n", "")
-    stripped = dd.replace(" ", "")
+#     dd = dd.replace("\n", "")
+#     stripped = dd.replace(" ", "")
     
-    return stripped
+#     return stripped
 
 # url = "https://www.bol.com/nl/p/gouden-bergen/9200000124091929/?bltgh=oZIf0eSjOQHBpmHMkv1BLw.1_4.6.ProductImage"
 # url = "https://www.bol.com/nl/f/uncanny-valley/9200000099807607/"
+# url = "https://www.bol.com/nl/p/de-prooi/9200000072838235/?bltgh=iwlEjT4lH-OiQTsSCxlF9Q.1_4.5.ProductTitle"
 
 # get_information(url)
+
 
 
 

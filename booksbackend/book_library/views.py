@@ -3,6 +3,8 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
 from django.views import generic
+from django.db.models import Q
+
 import datetime
 
 import pdb
@@ -57,6 +59,7 @@ def detail(request, book_id):
 
     context = {
         'book' : book,
+        'author' : book.author,
         'fieldnames' : [f'{f.capitalize()} : {v}' for f, v in book.__iter__()],
         'score_range' : range(1,6),
         'status' : status
@@ -64,7 +67,18 @@ def detail(request, book_id):
     }
     return render(request, 'book_library/detail.html', context)
 
+def author_page(request, author_id):
+    author = get_object_or_404(Author, pk=author_id)
 
+    book_list = Book.objects.filter(author__id=author.id)
+    
+    print(book_list)
+    context = {
+        'author' : author,
+        'book_list' : book_list,
+    }
+    
+    return render(request, 'book_library/author_page.html', context)
 
 def rate(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
@@ -114,49 +128,51 @@ def add_book(request):
 
     information = get_information(url)
 
-    aut_str = information['authors'].split()
-    new_author = Author(first_name=aut_str[0], last_name=' '.join(aut_str[1:]))
-    new_author.save()
-
-    new_publisher = Publisher(name=information['publisher'])
-    new_publisher.save()
-
-    raw_date = information['publication_date']
-    date_digits = ''.join(s for s in raw_date if s.isdigit()).replace(' ', '')
-    date_month = ''.join(s for s in raw_date if s.isalpha()).replace(' ', '')
-
-    date_dict = {'januari' : 1,
-                 'februari' : 2,
-                 'maart' : 3,
-                 'april' : 4,
-                 'mei' : 5,
-                 'juni' : 6,
-                 'juli' : 7,
-                 'augustus' : 8,
-                 'september' : 9,
-                 'oktober' : 10,
-                 'november' : 11,
-                 'december' : 12
-                     
-    }
-
-    parsed_date = f"{date_digits}-{date_dict[date_month.lower()]}-1"
-
     try:
         book = get_object_or_404(Book, title=information['title'])
         return HttpResponseRedirect(reverse('book_library:index'))
     except:
-    
+        aut_str = information['author'].split()
+        new_author = Author(first_name=aut_str[0], last_name=' '.join(aut_str[1:]))
+        new_author.save()
+
+        publisher = Publisher.objects.filter(name=information['publisher'])
+
+        if not publisher:
+            new_publisher = Publisher(name=information['publisher'])
+            new_publisher.save()
+            publisher = new_publisher
+        else:
+            publisher = publisher[0]
+        
         new_book = Book(title=information['title'],
+                        author=new_author,
                         subtitle=information['subtitle'],
-                        publication_date=parsed_date,
-                        publisher=new_publisher,
-                        pages=information['pages'],
-                        # EAN=information['EAN'],
+                        publication_date=information['publication_date'],
+                        publisher=publisher,
+                        # pages=information['pages'],
+                        isbn=information['isbn'],
                         URL=url,
                         date_added=datetime.datetime.now())
 
         new_book.save()    
-        new_book.authors.add(new_author)
+        # new_book.authors.add(new_author)
         
         return HttpResponseRedirect(reverse('book_library:index'))
+
+
+
+def search_book(request):
+    query = request.GET['search_book']
+
+    query_results = Book.objects.filter(
+        Q(title__icontains=query) | Q(authors__first_name__icontains=query) | Q(authors__last_name__icontains=query))
+    
+    
+    context = {
+        'query': query,
+        'query_results' : query_results,
+    }
+    
+    return render(request, 'book_library/search_results.html', context)
+
