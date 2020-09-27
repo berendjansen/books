@@ -6,4 +6,4 @@
 - Search books by title or author
 
 ![image of front page]
-(./book_page_demo.png)
+(http://github.omc/berendjansen/books/blob/master/book_page_demo.png)
