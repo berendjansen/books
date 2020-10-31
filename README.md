@@ -1,6 +1,6 @@
 # Django app to keep track of home library
 
-Front-end inspired by https://books.hansdezwart.nl.
+Inspired by https://books.hansdezwart.nl.
 
 - Home library with different lists
 - Add books by bol.com urls
